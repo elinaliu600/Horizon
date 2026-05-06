@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horizon 每日 AI 新闻速递</title>
+<style>
+  :root { --bg: #faf8f5; --text: #2d2a3e; --link: #6d4aaa; --border: #e0dbd3; --tag-bg: #ede7fb; --score: #e0652e; }
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 1.5rem; background: var(--bg); color: var(--text); line-height: 1.7; }
+  h1 { border-bottom: 2px solid var(--border); padding-bottom: .5rem; font-size: 1.6rem; }
+  h2 { font-size: 1.15rem; margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  h2 a { color: var(--text); text-decoration: none; }
+  h2 a:hover { color: var(--link); }
+  a { color: var(--link); }
+  .score { color: var(--score); font-weight: 600; font-size: .85rem; }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; margin: 1rem 0; }
+  .toc ol { margin: .5rem 0 0 0; padding-left: 1.5rem; }
+  .toc li { margin: .3rem 0; font-size: .95rem; }
+  .toc a { text-decoration: none; }
+  .meta { color: #7c7891; font-size: .85rem; margin: .5rem 0; }
+  .tags { margin: .5rem 0 1rem; }
+  .tags span { display: inline-block; background: var(--tag-bg); color: var(--link); padding: .1rem .6rem; border-radius: 12px; font-size: .8rem; margin: .2rem .3rem .2rem 0; }
+  details { margin: .5rem 0; font-size: .9rem; color: #555; }
+  summary { cursor: pointer; color: var(--link); }
+  blockquote { border-left: 3px solid var(--border); margin: .5rem 0; padding: .3rem 1rem; color: #7c7891; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  nav { display: flex; gap: 1rem; margin-bottom: 1.5rem; font-size: .9rem; }
+  nav a { text-decoration: none; padding: .3rem .8rem; border-radius: 16px; background: #fff; border: 1px solid var(--border); }
+  nav a.active { background: var(--link); color: #fff; border-color: var(--link); }
+  #loading { text-align: center; padding: 3rem; color: #7c7891; }
+  .source { font-size: .8rem; color: #999; margin-left: .5rem; }
+  .community { background: #f3f0eb; border-radius: 8px; padding: .5rem 1rem; margin: .5rem 0; font-size: .9rem; }
+  @media (max-width: 600px) { body { padding: 1rem; } }
+</style>
+</head>
+<body>
+<nav>
+  <a href="#" class="active" onclick="loadPost('zh');return false">中文日报</a>
+  <a href="#" onclick="loadPost('en');return false">English</a>
+  <a href="https://github.com/elinaliu600/Horizon">GitHub</a>
+</nav>
+<div id="loading">📡 加载日报中...</div>
+<div id="content"></div>
+<script>
+const BASE = '/Horizon/posts';
+
+async function findLatest(lang) {
+  try {
+    const r = await fetch(BASE + '/manifest.txt');
+    if (!r.ok) throw new Error('no manifest');
+    const files = (await r.text()).trim().split('\n').filter(f => f.includes(`summary-${lang}`));
+    return files.sort().pop();
+  } catch {
+    return null;
+  }
+}
+
+async function loadPost(lang) {
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('content').innerHTML = '';
+
+  let file = await findLatest(lang);
+  if (!file) {
+    const d = new Date();
+    file = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}-summary-${lang}.md`;
+  }
+
+  try {
+    const r = await fetch(BASE + '/' + file);
+    if (!r.ok) throw new Error('fetch failed');
+    let md = await r.text();
+    // Remove Jekyll frontmatter
+    md = md.replace(/^---[\s\S]*?---\n*/, '');
+    // Use marked.js to render
+    if (typeof marked !== 'undefined') {
+      document.getElementById('content').innerHTML = marked.parse(md);
+    } else {
+      document.getElementById('content').innerHTML = '<pre>' + escapeHtml(md) + '</pre>';
+    }
+  } catch(e) {
+    document.getElementById('content').innerHTML = '<p style="text-align:center;color:#7c7891;padding:3rem">日报尚未生成，请稍后再来。<br>每天早上 10:00 更新。</p>';
+  }
+  document.getElementById('loading').style.display = 'none';
+}
+
+function escapeHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Load marked.js
+const s = document.createElement('script');
+s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+s.onload = () => loadPost('zh');
+document.head.appendChild(s);
+</script>
+</body>
+</html>

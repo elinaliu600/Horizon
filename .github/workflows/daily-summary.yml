@@ -36,6 +36,13 @@ jobs:
           LWN_KEY: ${{ secrets.LWN_KEY }}
         run: uv run horizon --hours 24
 
+      - name: Prepare static site (no Jekyll)
+        run: |
+          mkdir -p docs/posts
+          cp docs/_posts/*.md docs/posts/ 2>/dev/null || true
+          ls docs/posts/*.md | sed 's|docs/posts/||' > docs/posts/manifest.txt
+          touch docs/.nojekyll
+
       - name: Set current date as environment variable
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
@@ -44,7 +51,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
-          keep_files: true  # Keep existing summaries on gh-pages branch
+          keep_files: true
           commit_message: "📝 Daily Summary: ${{ env.DATE }}"
           publish_branch: gh-pages
-          enable_jekyll: true
+          enable_jekyll: false

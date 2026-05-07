@@ -36,6 +36,18 @@
         "owner": "triton-lang",
         "repo": "triton",
         "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "shadcn-ui",
+        "repo": "ui",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "tailwindlabs",
+        "repo": "tailwindcss",
+        "enabled": true
       }
     ],
     "hackernews": {
@@ -61,6 +73,24 @@
         "url": "https://lwn.net/headlines/full_text?key=${LWN_KEY}",
         "enabled": true,
         "category": "linux-kernel"
+      },
+      {
+        "name": "Smashing Magazine",
+        "url": "https://www.smashingmagazine.com/feed/",
+        "enabled": true,
+        "category": "web-design"
+      },
+      {
+        "name": "Sidebar.io",
+        "url": "https://sidebar.io/feed.xml",
+        "enabled": true,
+        "category": "web-design"
+      },
+      {
+        "name": "Nielsen Norman Group",
+        "url": "https://www.nngroup.com/feed/rss/",
+        "enabled": true,
+        "category": "ux-research"
       }
     ],
     "reddit": {
@@ -81,6 +111,30 @@
           "time_filter": "day",
           "fetch_limit": 15,
           "min_score": 60
+        },
+        {
+          "subreddit": "web_design",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 15,
+          "min_score": 30
+        },
+        {
+          "subreddit": "UXDesign",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 15,
+          "min_score": 30
+        },
+        {
+          "subreddit": "FigmaDesign",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 10,
+          "min_score": 10
         }
       ],
       "users": [],

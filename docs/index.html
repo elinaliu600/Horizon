@@ -3,95 +3,638 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Horizon 每日 AI 新闻速递</title>
+<title>Horizon 每日速递</title>
 <style>
-  :root { --bg: #faf8f5; --text: #2d2a3e; --link: #6d4aaa; --border: #e0dbd3; --tag-bg: #ede7fb; --score: #e0652e; }
-  body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 1.5rem; background: var(--bg); color: var(--text); line-height: 1.7; }
-  h1 { border-bottom: 2px solid var(--border); padding-bottom: .5rem; font-size: 1.6rem; }
-  h2 { font-size: 1.15rem; margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
-  h2 a { color: var(--text); text-decoration: none; }
-  h2 a:hover { color: var(--link); }
-  a { color: var(--link); }
-  .score { color: var(--score); font-weight: 600; font-size: .85rem; }
-  .toc { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; margin: 1rem 0; }
-  .toc ol { margin: .5rem 0 0 0; padding-left: 1.5rem; }
-  .toc li { margin: .3rem 0; font-size: .95rem; }
-  .toc a { text-decoration: none; }
-  .meta { color: #7c7891; font-size: .85rem; margin: .5rem 0; }
-  .tags { margin: .5rem 0 1rem; }
-  .tags span { display: inline-block; background: var(--tag-bg); color: var(--link); padding: .1rem .6rem; border-radius: 12px; font-size: .8rem; margin: .2rem .3rem .2rem 0; }
-  details { margin: .5rem 0; font-size: .9rem; color: #555; }
-  summary { cursor: pointer; color: var(--link); }
-  blockquote { border-left: 3px solid var(--border); margin: .5rem 0; padding: .3rem 1rem; color: #7c7891; }
-  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
-  nav { display: flex; gap: 1rem; margin-bottom: 1.5rem; font-size: .9rem; }
-  nav a { text-decoration: none; padding: .3rem .8rem; border-radius: 16px; background: #fff; border: 1px solid var(--border); }
-  nav a.active { background: var(--link); color: #fff; border-color: var(--link); }
-  #loading { text-align: center; padding: 3rem; color: #7c7891; }
-  .source { font-size: .8rem; color: #999; margin-left: .5rem; }
-  .community { background: #f3f0eb; border-radius: 8px; padding: .5rem 1rem; margin: .5rem 0; font-size: .9rem; }
-  @media (max-width: 600px) { body { padding: 1rem; } }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --bg: #fbfaf7;
+    --card-bg: #ffffff;
+    --text: #1a1a2e;
+    --text-secondary: #6b6880;
+    --text-muted: #9b98b0;
+    --border: #e8e5e0;
+    --accent: #e0652e;
+    --accent-soft: #fef3ee;
+    --link: #4f46e5;
+    --link-hover: #3730a3;
+    --tag-bg: #f0edf7;
+    --tag-text: #6758a8;
+    --score-high: #be185d;
+    --score-good: #e0652e;
+    --score-mid: #ca8a04;
+    --score-low: #7c7891;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.06);
+    --radius: 16px;
+    --radius-sm: 8px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12101b;
+      --card-bg: #1d1a2b;
+      --text: #e8e4f0;
+      --text-secondary: #a09cb8;
+      --text-muted: #6b6880;
+      --border: #2a2638;
+      --accent: #f08050;
+      --accent-soft: #2a1a12;
+      --link: #8b8cf0;
+      --link-hover: #a5a6f5;
+      --tag-bg: #24203a;
+      --tag-text: #9b90d8;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.2);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.3);
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Noto Sans SC", "Inter", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* ---- Header ---- */
+  .header {
+    background: linear-gradient(135deg, #312e81 0%, #6d28d9 30%, #be185d 70%, #f97316 100%);
+    padding: 3rem 1.5rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .header-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+  .header h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -.02em;
+  }
+  .header .subtitle {
+    color: rgba(255,255,255,.7);
+    font-size: .95rem;
+    margin-top: .5rem;
+    font-weight: 400;
+  }
+
+  /* ---- Lang toggle ---- */
+  .lang-bar {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
+    margin-top: 1.5rem;
+  }
+  .lang-bar button {
+    padding: .45rem 1.25rem;
+    border: 1.5px solid rgba(255,255,255,.3);
+    background: transparent;
+    color: rgba(255,255,255,.7);
+    border-radius: 99px;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+  }
+  .lang-bar button:hover { border-color: rgba(255,255,255,.6); color: #fff; }
+  .lang-bar button.active { background: #fff; color: #312e81; border-color: #fff; }
+
+  /* ---- Main ---- */
+  .main { max-width: 760px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* Date + stats bar */
+  .day-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-header .date { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  .day-header .stats { font-size: .85rem; color: var(--text-muted); }
+
+  /* TOC */
+  .toc {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.75rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .toc h3 {
+    font-size: .85rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--text-muted);
+    margin-bottom: .75rem;
+    font-weight: 600;
+  }
+  .toc ol { list-style: none; counter-reset: toc; }
+  .toc li {
+    counter-increment: toc;
+    padding: .4rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toc li:last-child { border-bottom: none; }
+  .toc li::before {
+    content: counter(toc);
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
+    text-align: center;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    border-radius: 6px;
+    font-size: .75rem;
+    font-weight: 700;
+    margin-right: .75rem;
+    vertical-align: middle;
+  }
+  .toc a { text-decoration: none; color: var(--text); font-weight: 500; font-size: .95rem; }
+  .toc a:hover { color: var(--link); }
+  .toc .toc-score {
+    float: right;
+    font-size: .8rem;
+    font-weight: 700;
+    padding: .15rem .5rem;
+    border-radius: 6px;
+    color: #fff;
+  }
+
+  /* Article card */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s;
+    scroll-margin-top: 2rem;
+  }
+  .card:hover { box-shadow: var(--shadow-md); }
+
+  .card h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.5;
+    letter-spacing: -.01em;
+    margin-bottom: .75rem;
+  }
+  .card h2 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .card h2 a:hover { color: var(--link); }
+
+  .card .score-badge {
+    display: inline-block;
+    font-size: .75rem;
+    font-weight: 800;
+    padding: .2em .6em;
+    border-radius: 6px;
+    color: #fff;
+    margin-left: .4rem;
+    vertical-align: middle;
+  }
+
+  .card .summary {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.8;
+  }
+
+  /* Meta row */
+  .card .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+    font-size: .82rem;
+    color: var(--text-muted);
+    padding: .75rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+  .card .meta .source-icon {
+    display: inline-block;
+    padding: .15rem .55rem;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .si-hn     { background: #ff660022; color: #ff6600; }
+  .si-reddit { background: #ff450022; color: #ff4500; }
+  .si-rss    { background: #f9731622; color: #f97316; }
+  .si-github { background: #33333322; color: #333; }
+  .si-telegram{background: #0088cc22; color: #0088cc; }
+  .si-twitter{ background: #1d9bf022; color: #1d9bf0; }
+
+  @media (prefers-color-scheme: dark) {
+    .si-hn     { color: #ff944d; }
+    .si-reddit { color: #ff704d; }
+    .si-rss    { color: #fba05a; }
+    .si-github { color: #aaa; }
+    .si-telegram{color: #4db8e8; }
+    .si-twitter{ color: #5eb8f0; }
+  }
+
+  /* Background callout */
+  .card .background {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: .75rem 1rem;
+    margin: 1rem 0;
+    font-size: .9rem;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+  .card .background strong { color: var(--accent); }
+
+  /* Discussion */
+  .card .discussion {
+    font-size: .9rem;
+    color: var(--text-secondary);
+    padding: .5rem 0;
+    line-height: 1.75;
+  }
+
+  /* Tags */
+  .card .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: 1rem;
+  }
+  .card .tags span {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    padding: .2rem .7rem;
+    border-radius: 99px;
+    font-size: .78rem;
+    font-weight: 600;
+  }
+
+  /* References */
+  .card .refs {
+    margin-top: 1rem;
+  }
+  .card .refs summary {
+    font-size: .82rem;
+    color: var(--link);
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .card .refs ul { margin-top: .5rem; padding-left: 1.25rem; font-size: .85rem; }
+  .card .refs li { margin: .25rem 0; }
+  .card .refs a { color: var(--text-muted); font-size: .82rem; }
+  .card .refs a:hover { color: var(--link); }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+  }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state h2 { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: .5rem; }
+  .empty-state p { font-size: .9rem; line-height: 1.8; }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 5rem 1rem;
+    color: var(--text-muted);
+  }
+  .loading .spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 2rem 1rem 3rem;
+    color: var(--text-muted);
+    font-size: .78rem;
+  }
+  .footer a { color: var(--link); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .header { padding: 2rem 1rem 1.5rem; }
+    .header h1 { font-size: 1.4rem; }
+    .card { padding: 1.25rem 1rem; }
+    .card h2 { font-size: 1.1rem; }
+    .day-header { flex-direction: column; }
+    .toc { padding: 1rem; }
+  }
 </style>
 </head>
 <body>
-<nav>
-  <a href="#" class="active" onclick="loadPost('zh');return false">中文日报</a>
-  <a href="#" onclick="loadPost('en');return false">English</a>
-  <a href="https://github.com/elinaliu600/Horizon">GitHub</a>
-</nav>
-<div id="loading">📡 加载日报中...</div>
-<div id="content"></div>
+
+<header class="header">
+  <div class="header-inner">
+    <h1>Horizon 每日速递</h1>
+    <p class="subtitle">AI 策展的技术与设计新闻 · 每天上午 10:00 更新</p>
+    <div class="lang-bar">
+      <button class="active" onclick="switchLang('zh')">中文</button>
+      <button onclick="switchLang('en')">English</button>
+    </div>
+  </div>
+</header>
+
+<div class="main" id="loading-area">
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>正在加载日报…</p>
+  </div>
+</div>
+
+<div class="main" id="content-area" style="display:none"></div>
+
+<footer class="footer">
+  <p>由 <a href="https://github.com/elinaliu600/Horizon" target="_blank">Horizon</a> 自动生成 &middot; AI 筛选并摘要 &middot; 信息可能存在偏差，仅供参考</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-const BASE = '/Horizon/posts';
+const POSTS_BASE = '/Horizon/posts';
+let currentLang = 'zh';
+
+// ---- Language switch ----
+function switchLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-bar button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  loadReport(lang);
+}
+
+// ---- Load and render ----
+async function loadReport(lang) {
+  const loading = document.getElementById('loading-area');
+  const content = document.getElementById('content-area');
+  loading.style.display = 'block';
+  content.style.display = 'none';
+
+  const file = await findLatest(lang);
+  if (!file) {
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    content.innerHTML = `<div class="empty-state">
+      <div class="icon">📭</div>
+      <h2>日报尚未生成</h2>
+      <p>今天的信息还在路上，每天上午 10:00 左右更新。<br>如果刚部署，等待第一次 GitHub Actions 运行完成。</p>
+    </div>`;
+    return;
+  }
+
+  try {
+    const r = await fetch(POSTS_BASE + '/' + file);
+    if (!r.ok) throw new Error('fetch failed');
+    let md = await r.text();
+    md = md.replace(/^---[\s\S]*?---\n*/, '');
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    content.innerHTML = renderMarkdown(md, lang);
+    applyPostProcessing();
+  } catch(e) {
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    content.innerHTML = `<div class="empty-state">
+      <div class="icon">📭</div>
+      <h2>日报尚未生成</h2>
+      <p>每天上午 10:00 左右更新，请稍后再来。</p>
+    </div>`;
+  }
+}
 
 async function findLatest(lang) {
   try {
-    const r = await fetch(BASE + '/manifest.txt');
-    if (!r.ok) throw new Error('no manifest');
+    const r = await fetch(POSTS_BASE + '/manifest.txt');
+    if (!r.ok) return null;
     const files = (await r.text()).trim().split('\n').filter(f => f.includes(`summary-${lang}`));
     return files.sort().pop();
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
-async function loadPost(lang) {
-  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('content').innerHTML = '';
+// ---- Custom render: transform Markdown into our card layout ----
+function renderMarkdown(md, lang) {
+  // Parse the markdown into sections
+  const lines = md.split('\n');
+  let html = '';
 
-  let file = await findLatest(lang);
-  if (!file) {
-    const d = new Date();
-    file = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}-summary-${lang}.md`;
-  }
+  // Extract header: first h1 line gives date
+  const h1Match = md.match(/^# (.+?) - (.+)$/m);
+  const headerTitle = h1Match ? h1Match[1] : 'Horizon Daily';
+  const date = h1Match ? h1Match[2] : '';
 
-  try {
-    const r = await fetch(BASE + '/' + file);
-    if (!r.ok) throw new Error('fetch failed');
-    let md = await r.text();
-    // Remove Jekyll frontmatter
-    md = md.replace(/^---[\s\S]*?---\n*/, '');
-    // Use marked.js to render
-    if (typeof marked !== 'undefined') {
-      document.getElementById('content').innerHTML = marked.parse(md);
-    } else {
-      document.getElementById('content').innerHTML = '<pre>' + escapeHtml(md) + '</pre>';
+  // Extract stats line
+  const statsMatch = md.match(/> (.+)/);
+  const stats = statsMatch ? statsMatch[1] : '';
+
+  // Day header
+  html += `<div class="day-header">`;
+  html += `<span class="date">${date}</span>`;
+  html += `<span class="stats">${stats}</span>`;
+  html += `</div>`;
+
+  // Parse TOC and items
+  // Find TOC section: numbered list items before the first --- separator
+  const tocStart = md.indexOf('\n1. [');
+  let tocHtml = '';
+  let itemsHtml = '';
+
+  if (tocStart > 0) {
+    // Find the end of TOC (next ---)
+    const afterToc = md.indexOf('---\n', tocStart);
+    const tocSection = afterToc > 0 ? md.substring(tocStart, afterToc) : '';
+
+    // Parse each TOC line
+    const tocLines = tocSection.split('\n').filter(l => /^\d+\.\s*\[/.test(l));
+    if (tocLines.length > 0) {
+      tocHtml += `<div class="toc"><h3>今日精选</h3><ol>`;
+      tocLines.forEach(line => {
+        const m = line.match(/^\d+\.\s*\[(.+?)\]\(#item-(\d+)\).*?(\d+(?:\.\d+)?)\/10/);
+        if (m) {
+          const title = m[1];
+          const idx = m[2];
+          const score = parseFloat(m[3]);
+          const tier = score >= 9 ? 'var(--score-high)' : score >= 7 ? 'var(--score-good)' : score >= 5 ? 'var(--score-mid)' : 'var(--score-low)';
+          tocHtml += `<li><a href="#item-${idx}">${title}</a><span class="toc-score" style="background:${tier}">${score}</span></li>`;
+        }
+      });
+      tocHtml += `</ol></div>`;
     }
-  } catch(e) {
-    document.getElementById('content').innerHTML = '<p style="text-align:center;color:#7c7891;padding:3rem">日报尚未生成，请稍后再来。<br>每天早上 10:00 更新。</p>';
   }
-  document.getElementById('loading').style.display = 'none';
+
+  html += tocHtml;
+
+  // Parse each item card
+  // Items start with <a id="item-N"></a> and end with ---
+  const itemRegex = /<a id="item-(\d+)"><\/a>\s*\n## \[(.+?)\]\((.+?)\) ⭐️ ([\d.]+)\/10\s*\n\n([\s\S]*?)(?=\n\n<a id="item-|$)/g;
+  let match;
+  let itemIndex = 0;
+  const items = [];
+
+  while ((match = itemRegex.exec(md)) !== null) {
+    items.push({
+      id: match[1],
+      title: match[2],
+      url: match[3],
+      score: parseFloat(match[4]),
+      body: match[5].trim()
+    });
+  }
+
+  items.forEach(item => {
+    html += renderCard(item, lang);
+  });
+
+  if (items.length === 0) {
+    // Fallback: try to render with basic marked conversion
+    html += `<div class="card">${marked.parse(md)}</div>`;
+  }
+
+  return html;
 }
 
-function escapeHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function renderCard(item, lang) {
+  const score = item.score;
+  const tier = score >= 9 ? 'var(--score-high)' : score >= 7 ? 'var(--score-good)' : score >= 5 ? 'var(--score-mid)' : 'var(--score-low)';
 
-// Load marked.js
-const s = document.createElement('script');
-s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-s.onload = () => loadPost('zh');
-document.head.appendChild(s);
+  let body = item.body;
+  // Parse body sections
+  let summary = '';
+  let sourceLine = '';
+  let background = '';
+  let discussion = '';
+  let tags = [];
+  let refsHtml = '';
+
+  const lines = body.split('\n');
+
+  // The summary is the first non-empty text after the header, before the source line
+  let afterSource = false;
+  let summaryLines = [];
+  let sourceIdx = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i].trim();
+    if (!l) continue;
+
+    // Source line detection (starts with source type)
+    if (/^(rss|reddit|github|hackernews|hn|telegram|twitter|x)\s*[··]/.test(l.toLowerCase())) {
+      sourceLine = l;
+      sourceIdx = i;
+      afterSource = true;
+      continue;
+    }
+
+    if (!afterSource) {
+      // Check if it's the summary (before the source line)
+      if (!l.startsWith('**') && !l.startsWith('<details') && !l.startsWith('<a ')) {
+        summaryLines.push(l);
+      }
+    }
+
+    // Background
+    if (/^\*\*背景\*\*:/.test(l) || /^\*\*Background\*\*:/.test(l)) {
+      background = l.replace(/^\*\*(背景|Background)\*\*:\s*/, '');
+      continue;
+    }
+    if (/^\*\*社区讨论\*\*:/.test(l) || /^\*\*Discussion\*\*:/.test(l)) {
+      discussion = l.replace(/^\*\*(社区讨论|Discussion)\*\*:\s*/, '');
+      continue;
+    }
+    // Tags
+    if (/^\*\*标签\*\*:/.test(l) || /^\*\*Tags\*\*:/.test(l)) {
+      const tagStr = l.replace(/^\*\*(标签|Tags)\*\*:\s*/, '');
+      tags = tagStr.match(/#(\w[-\w]*)/g)?.map(t => t.replace('#', '')) || [];
+      continue;
+    }
+  }
+
+  summary = summaryLines.join(' ').trim();
+  // Use marked to render inline markdown in summary and background
+  summary = marked.parse(summary).replace(/<\/?p>/g, '');
+  background = marked.parse(background).replace(/<\/?p>/g, '');
+  discussion = marked.parse(discussion).replace(/<\/?p>/g, '');
+
+  // Extract references
+  const detailsMatch = body.match(/<details><summary>(.*?)<\/summary>\s*<ul>\s*([\s\S]*?)<\/ul>\s*<\/details>/);
+  if (detailsMatch) {
+    const refLabel = detailsMatch[1];
+    const refItems = detailsMatch[2];
+    refsHtml = `<div class="refs"><details><summary>${refLabel}</summary><ul>${refItems}</ul></details></div>`;
+  }
+
+  // Source icon class
+  let sourceIconClass = 'si-rss';
+  const sl = sourceLine.toLowerCase();
+  if (sl.startsWith('hackernews') || sl.startsWith('hn')) sourceIconClass = 'si-hn';
+  else if (sl.startsWith('reddit')) sourceIconClass = 'si-reddit';
+  else if (sl.startsWith('rss')) sourceIconClass = 'si-rss';
+  else if (sl.startsWith('github')) sourceIconClass = 'si-github';
+  else if (sl.startsWith('telegram')) sourceIconClass = 'si-telegram';
+  else if (sl.startsWith('twitter') || sl.startsWith('x ')) sourceIconClass = 'si-twitter';
+
+  // Extract source type name
+  const sourceType = sourceLine.split(/[··]/)[0].trim();
+
+  return `
+<div class="card" id="item-${item.id}">
+  <h2>
+    <a href="${item.url}" target="_blank">${item.title}</a>
+    <span class="score-badge" style="background:${tier}">${score}/10</span>
+  </h2>
+  <p class="summary">${summary}</p>
+  <div class="meta">
+    <span class="source-icon ${sourceIconClass}">${sourceType}</span>
+    ${sourceLine.replace(sourceType, '').trim()}
+  </div>
+  ${background ? `<div class="background"><strong>背景</strong> ${background}</div>` : ''}
+  ${discussion ? `<div class="discussion"><strong>社区讨论</strong> ${discussion}</div>` : ''}
+  ${refsHtml}
+  ${tags.length > 0 ? `<div class="tags">${tags.map(t => `<span>#${t}</span>`).join('')}</div>` : ''}
+</div>`;
+}
+
+function applyPostProcessing() {
+  // Convert any remaining raw markdown links in rendered content
+}
+
+// ---- Init ----
+loadReport('zh');
 </script>
 </body>
 </html>
